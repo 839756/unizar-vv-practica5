@@ -31,6 +31,14 @@ public class InventoryTest {
     }
 
     @Test
+    public void should_never_changes_quailty_of_Sulfuras_sellin_negative() {
+        Item sulfuras = new Item("Sulfuras, Hand of Ragnaros", -1, 80);
+        Inventory inventory = createInventory(sulfuras);
+        inventory.updateQuality();
+        assertEquals(80, sulfuras.getQuality());
+    }
+
+    @Test
     public void should_lower_the_sellIn_by_one_for_normal_items() {
         Item normalItem = new Item("+5 Dexterity Vest", 10, 20);
         Inventory inventory = createInventory(normalItem);
@@ -63,6 +71,30 @@ public class InventoryTest {
     }
 
     @Test
+    public void should_lower_the_quality_by_one_for_special_items_limit() {
+        Item normalItem = new Item("+5 Dexterity Vest", -8, 1);
+        Inventory inventory = createInventory(normalItem);
+        inventory.updateQuality();
+        assertEquals(0, normalItem.getQuality());
+    }
+
+    @Test
+    public void should_not_lower_the_quality_below_zero_for_special_items() {
+        Item normalItem = new Item("+5 Dexterity Vest", -9, 0);
+        Inventory inventory = createInventory(normalItem);
+        inventory.updateQuality();
+        assertEquals(0, normalItem.getQuality());
+    }
+
+    @Test
+    public void should_lower_the_quality_twice_as_fast_limit (){
+        Item normalItem = new Item("+5 Dexterity Vest", 0, 25);
+        Inventory inventory = createInventory(normalItem);
+        inventory.updateQuality();
+        assertEquals(23, normalItem.getQuality());
+    }
+
+    @Test
     public void should_increase_the_quality_of_aged_brie_as_it_gets_older() {
         Item agedBrie = new Item("Aged Brie", 10, 25);
         Inventory inventory = createInventory(agedBrie);
@@ -76,6 +108,26 @@ public class InventoryTest {
         Inventory inventory = createInventory(agedBrie);
         inventory.updateQuality();
         assertEquals(50, agedBrie.getQuality());
+    }
+
+    @Test
+    public void should_increase_the_quality_twice_as_fast_once_sellin_negative() {
+        Item agedBrie1 = new Item("Aged Brie", -8, 25);
+        Item agedBrie2 = new Item("Aged Brie", -8, 50);
+        Item agedBrie3 = new Item("Aged Brie", -8, 49);
+        Inventory inventory = createInventory(agedBrie1, agedBrie2, agedBrie3);
+        inventory.updateQuality();
+        assertEquals(27, agedBrie1.getQuality());
+        assertEquals(50, agedBrie2.getQuality());
+        assertEquals(50, agedBrie3.getQuality());
+    }
+
+    @Test
+    public void should_increase_the_quality_twice_as_fast_once_sellin_negative_limit() {
+        Item agedBrie = new Item("Aged Brie", 0, 25);
+        Inventory inventory = createInventory(agedBrie);
+        inventory.updateQuality();
+        assertEquals(27, agedBrie.getQuality());
     }
 
     @Test
@@ -120,5 +172,63 @@ public class InventoryTest {
         assertEquals(50, backStagePassMoreThan10DaysAway.getQuality());
         assertEquals(50, backStagePass10DaysAway.getQuality());
         assertEquals(50, backStagePass5DaysAway.getQuality());
+    }
+
+    @Test
+    public void should_be_quality_50() {
+        Item backStagePass1 = new Item("Backstage passes to a TAFKAL80ETC concert", 10, 50);
+        Item backStagePass2 = new Item("Backstage passes to a TAFKAL80ETC concert", 6, 50);
+        Item backStagePass3 = new Item("Backstage passes to a TAFKAL80ETC concert", 6, 49);
+        Item backStagePass4 = new Item("Backstage passes to a TAFKAL80ETC concert", 5, 50);
+        Item backStagePass5 = new Item("Backstage passes to a TAFKAL80ETC concert", 5, 49);
+        Item backStagePass6 = new Item("Backstage passes to a TAFKAL80ETC concert", 1, 50);
+        Item backStagePass7 = new Item("Backstage passes to a TAFKAL80ETC concert", 1, 49);
+        Item backStagePass8 = new Item("Backstage passes to a TAFKAL80ETC concert", 1, 48);
+        
+        Inventory inventory = createInventory(backStagePass1, backStagePass2, backStagePass3, backStagePass4, backStagePass5, backStagePass6, backStagePass7, backStagePass8);
+
+        inventory.updateQuality();
+        
+        assertEquals(50, backStagePass1.getQuality());
+        assertEquals(50, backStagePass2.getQuality());
+        assertEquals(50, backStagePass3.getQuality()); 
+        assertEquals(50, backStagePass4.getQuality());
+        assertEquals(50, backStagePass5.getQuality());
+        assertEquals(50, backStagePass6.getQuality());
+        assertEquals(50, backStagePass7.getQuality());   
+        assertEquals(50, backStagePass8.getQuality());
+    }
+
+    @Test
+    public void should_increase_backstage_passes_quality_twice_as_fast_limit() {
+        Item backStagePass = new Item("Backstage passes to a TAFKAL80ETC concert", 6, 25);
+        Inventory inventory = createInventory(backStagePass);
+    
+        inventory.updateQuality();
+        
+        assertEquals(27, backStagePass.getQuality());
+    }
+
+    @Test
+    public void should_increase_backstage_passes_quality_three_times_as_fast_limit() {
+        Item backStagePass = new Item("Backstage passes to a TAFKAL80ETC concert", 1, 25);
+        Inventory inventory = createInventory(backStagePass);
+    
+        inventory.updateQuality();
+        
+        assertEquals(28, backStagePass.getQuality());
+    }
+
+    @Test
+    public void should_be_quality_0() {
+        Item backStagePass1 = new Item("Backstage passes to a TAFKAL80ETC concert", 0, 25);
+        Item backStagePass2 = new Item("Backstage passes to a TAFKAL80ETC concert", -8, 0);
+
+        Inventory inventory = createInventory(backStagePass1, backStagePass2);
+
+        inventory.updateQuality();
+        
+        assertEquals(0, backStagePass1.getQuality());
+        assertEquals(0, backStagePass2.getQuality());
     }
 }
